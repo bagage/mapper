@@ -20,8 +20,12 @@
 find_package(Qt5Core 5.2 REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Xml REQUIRED)
-find_package(Qt5Network)
-find_package(Qt5PrintSupport)
+if(ANDROID)
+	find_package(Qt5AndroidExtras REQUIRED)
+else()
+	find_package(Qt5Network)
+	find_package(Qt5PrintSupport)
+endif()
 
 if(Mapper_PACKAGE_QT AND UNIX AND NOT APPLE AND NOT Mapper_DEVELOPMENT_BUILD)
 	set(MAPPER_USE_QT_CONF_QRC 1)
@@ -337,6 +341,11 @@ set(Mapper_Common_HEADERS
   util_gui.h
 )
 
+if(ANDROID)
+	add_definitions(-DNO_NATIVE_FILE_FORMAT)
+	list(REMOVE_ITEM Mapper_Common_SRCS file_format_native.cpp)
+endif()
+
 qt5_wrap_cpp(Mapper_Common_MOC ${Mapper_Common_MOC_INPUT} TARGET Mapper_Common)
 
 # Resources (from project root)
@@ -365,11 +374,15 @@ add_dependencies(Mapper_Common
 target_link_libraries(Mapper_Common
   libocad
   polyclipping
-  printsupport
   ${PROJ_LIBRARY}
   Qt5::Widgets
   Qt5::Xml
 )
+if(Qt5AndroidExtras_FOUND)
+	target_link_libraries(Mapper_Common
+	  Qt5::AndroidExtras
+	)
+endif()
 if(Qt5Network_FOUND)
 	target_link_libraries(Mapper_Common
 	  Qt5::Network
@@ -377,6 +390,7 @@ if(Qt5Network_FOUND)
 endif()
 if(Qt5PrintSupport_FOUND)
 	target_link_libraries(Mapper_Common
+	  printsupport
 	  Qt5::PrintSupport
 	)
 endif()
@@ -467,8 +481,10 @@ endforeach()
 
 # qmake configuration
 
-set(MAPPER_PRO_GENERATOR "Generated in CMakeLists.txt from src.pro.in")
-string(REPLACE ";" " \\\n  " MAPPER_PRO_HEADERS "${Mapper_Common_MOC_INPUT};${Mapper_Common_HEADERS}")
-string(REPLACE ";" " \\\n  " MAPPER_PRO_SOURCES "${Mapper_Common_SRCS}")
-configure_file(src.pro.in src.pro.tmp @ONLY)
-execute_process(COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_BINARY_DIR}/src.pro.tmp" "${CMAKE_CURRENT_SOURCE_DIR}/src.pro")
+if(NOT ANDROID)
+	set(MAPPER_PRO_GENERATOR "Generated in CMakeLists.txt from src.pro.in")
+	string(REPLACE ";" " \\\n  " MAPPER_PRO_HEADERS "${Mapper_Common_MOC_INPUT};${Mapper_Common_HEADERS}")
+	string(REPLACE ";" " \\\n  " MAPPER_PRO_SOURCES "${Mapper_Common_SRCS}")
+	configure_file(src.pro.in src.pro.tmp @ONLY)
+	execute_process(COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_BINARY_DIR}/src.pro.tmp" "${CMAKE_CURRENT_SOURCE_DIR}/src.pro")
+endif()
