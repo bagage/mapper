@@ -199,7 +199,7 @@ if(Mapper_BUILD_CLIPPER)
 	add_feature_info(Mapper_BUILD_CLIPPER 1 "version: ${CLIPPER_VERSION}")
 else()
 	set(CLIPPER_VERSION 6.1.3a)
-	find_package(Clipper MODULE REQUIRED)
+	find_package(Clipper REQUIRED NAMES polyclipping)
 endif()
 
 if(Mapper_BUILD_PROJ)
