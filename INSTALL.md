@@ -73,8 +73,9 @@ PROJ.4 library and of CUPS are installed. For a Ubuntu or Debian system, install
 `libproj-dev` and `libcups2-dev`.
 
 For using the Qt libraries provided by the repositories, the following packages
-need to be installed:
-`qt5-default` (>= 5.2), `qtbase5-private-dev`, `qttools5-dev`, `qttools5-dev-tools`, `libqt5sql5-sqlite`
+need to be installed. `qt5-default` needs at least version 5.2:
+
+`qt5-default` `qtbase5-private-dev` `qttools5-dev` `qttools5-dev-tools` `libqt5sql5-sqlite`
 
 Open a terminal, and create a build directory, e.g. as subdirectory build in
 the source directory, and change to that directory. From the build directory,
